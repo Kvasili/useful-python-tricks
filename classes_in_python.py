@@ -1,3 +1,13 @@
+'''
+
+    python basics about classes
+    check: 
+    https://www.youtube.com/watch?v=tmY6FEF8f1o&ab_channel=KeithGalli
+
+
+'''
+
+
 import matplotlib.pyplot as plt
 import turtle
 
@@ -49,8 +59,13 @@ class Point:
         self.y = y
 
     def __add__(self, other):
-        ''' operator overide - we assume that other is a point like object which can be used
-        for addition '''
+        ''' operator overloading - we assume that other is a point like object which can be used
+        for addition
+
+        check:
+         https://www.geeksforgeeks.org/operator-overloading-in-python/
+
+         '''
         x = self.x + other.x
         y = self.y + other.y
 
