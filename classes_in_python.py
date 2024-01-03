@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import turtle
 
 
@@ -30,7 +31,7 @@ class Polygon():
 
 
 shape = Polygon(5, "Pentagon", color="red", line_thickness=10)
-shape.draw()
+# shape.draw()
 
 
 class Square(Polygon):
@@ -38,5 +39,19 @@ class Square(Polygon):
         super().__init__(4, "square", color="blue", length=100, line_thickness=1)
 
 
-Square = Square()
-Square.draw()
+# Square = Square()
+# Square.draw()
+
+
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def plot(self):
+        plt.scatter(self.x, self.y)
+        plt.show()
+
+
+point = Point(6, 8)
+point.plot()
