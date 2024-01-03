@@ -48,10 +48,21 @@ class Point:
         self.x = x
         self.y = y
 
+    def __add__(self, other):
+        ''' operator overide - we assume that other is a point like object which can be used
+        for addition '''
+        x = self.x + other.x
+        y = self.y + other.y
+
+        return Point(x, y)
+
     def plot(self):
         plt.scatter(self.x, self.y)
         plt.show()
 
 
-point = Point(6, 8)
-point.plot()
+a = Point(1, 1)
+b = Point(10, 2)
+
+c = a+b
+print(c.x, c.y)
