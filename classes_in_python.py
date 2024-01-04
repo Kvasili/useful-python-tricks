@@ -39,6 +39,8 @@ class Polygon():
             turtle.right(180-self.angle)
         turtle.done()
 
+        self.message = "Hello World!"
+
 
 shape = Polygon(5, "Pentagon", color="red", line_thickness=10)
 # shape.draw()
@@ -76,8 +78,8 @@ class Point:
         plt.show()
 
 
-a = Point(1, 1)
-b = Point(10, 2)
+# a = Point(1, 1)
+# b = Point(10, 2)
 
-c = a+b
-print(c.x, c.y)
+# c = a+b
+# print(c.x, c.y)
