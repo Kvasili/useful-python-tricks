@@ -2,7 +2,7 @@
 '''
     @check:
 
-    https://www.youtube.com/watch?v=tmY6FEF8f1o&ab_channel=KeithGalli
+    https://www.youtube.com/watch?v=Gn5QoDCDGgo&t=631s&ab_channel=AngryPhysicist
 
 
     Python code that animates a 2D ideal gas of particles evolving in a square box. 
@@ -42,7 +42,8 @@ class IdealGass:
 
         grid_size = int(np.ceil(np.sqrt(N)))
         spacing = L/grid_size
-        x = np.linspace(radius + spacing/2, L - radius - spacing/2, grid_size)
+        x = np.linspace(radius + spacing/2, L -
+                        radius - spacing/2, grid_size)
         pos = list(product(x, x))
         self.r = np.array(pos[:N])
 
@@ -51,16 +52,77 @@ class IdealGass:
         vx, vy = v0*np.cos(theta), v0*np.sin(theta)
         self.v = np.stack((vx, vy), axis=1)
 
+    def check_collisions(self):
+        """
+            Checks for particle-particle collisions ans particle-wall collisions. 
+            If collisions are found, update the velocities of the particles colliding, 
+            accounting for the conservation of energy and momentum. 
+
+        """
+
+        r_next = self.r + self.v*self.dt  # position of the particle at the next timestep
+
+        # wall collisions
+        # collisions with the left wall
+        self.v[r_next[:, 0] < self.radius, 0] *= (-1)
+        # collisions with the right wall
+        self.v[r_next[:, 0] > self.L - self.radius, 0] *= (-1)
+        # collisions on the bottom of the wall
+        self.v[r_next[:, 1] < self.radius, 1] *= (-1)
+        # collisions on the top of the wall
+        self.v[r_next[:, 1] > self.L - self.radius, 1] *= (-1)
+
+        # particle-particle collisions
+        for i in range(self.N):
+            for j in range(i+1, self.N):
+                if np.linalg.norm(r_next[i] - r_next[j]) < 2*self.radius:
+
+                    rdiff = self.r[i] - self.r[j]
+                    vdiff = self.v[i] - self.v[j]
+
+                    self.v[i] = self.v[i] - \
+                        rdiff.dot(vdiff)/(rdiff.dot(rdiff)) * rdiff
+                    self.v[j] = self.v[j] - \
+                        rdiff.dot(vdiff)/(rdiff.dot(rdiff)) * rdiff
+
+    def step(self):
+        """ Compute the postions at the next timestep. """
+        self.check_collisions()
+        self.r += self.v*self.dt
+
+    def animate(self):
+        """ Animates the ideal gas for the specified number of steps. """
+        positions = np.zeros(self.nsteps, self.N,
+                             2)  # empty array to store positions
+        # empty array to store velocity norms
+        speeds = np.zeros((self.nsteps, self.N))
+
+        for n in range(self.nsteps):  # iterate through all timesteps
+            positions[n, :, :] = self.r  # append positions
+            speeds[n:] = np.linalg.norm(self.v, axis=1)  # append to velocities
+            self.step()
+
+        return positions, speeds
+
+    def MaxwellBoltzmann(self, v):
+        KE_avg = 1/2*self.mass*np.sum(self.v0**2)  # average kinetic energy
+        kT = KE_avg  # temperature
+        sigma_sq = kT/self.mass  # spread of the distribution
+        # Maxwell-Boltzmann distribution
+        f = np.exp(-v**2/(2*sigma_sq)) * v/sigma_sq
+        return f
+
 
 N = 20  # Number of particles
 mass = 1.0  # kg
 radius = 0.2  # m
-L = 20  # m
+L = 40  # m
 v0 = 3  # m/s
 duration = 10  # s
 nsteps = 750  # s
 
 gas = IdealGass(N, mass, radius, L, v0, duration, nsteps)
+
 fig = plt.figure()
 ax = fig.add_subplot(111)
 for (x, y) in gas.r:
