@@ -52,7 +52,7 @@ class IdealGass:
         self.v = np.stack((vx, vy), axis=1)
 
 
-N = 10  # Number of particles
+N = 20  # Number of particles
 mass = 1.0  # kg
 radius = 0.2  # m
 L = 20  # m
