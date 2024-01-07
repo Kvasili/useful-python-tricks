@@ -92,8 +92,8 @@ class IdealGass:
 
     def animate(self):
         """ Animates the ideal gas for the specified number of steps. """
-        positions = np.zeros(self.nsteps, self.N,
-                             2)  # empty array to store positions
+        positions = np.zeros(
+            (self.nsteps, N, 2))  # empty array to store positions
         # empty array to store velocity norms
         speeds = np.zeros((self.nsteps, self.N))
 
@@ -132,3 +132,52 @@ ax.set_xlim(0, L)
 ax.set_ylim(0, L)
 ax.set_aspect('equal')
 plt.show()
+
+
+positions, speeds = gas.animate()
+
+# check that the total kinetic energy is conserved
+np.sum(speeds[0]**2), np.sum(speeds[-1]**2)
+
+v = np.linspace(0, 35, 500)
+f = gas.MaxwellBoltzmann(v)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+
+
+def animate_positions(frame):
+    ax1.clear()
+    ax2.clear()
+    for i in range(gas.N):
+        x, y = positions[frame, i, 0], positions[frame, i, 1]
+        circle = plt.Circle((x, y), gas.radius, fill=True)
+        ax1.add_artist(circle)
+
+    ax2.hist(speeds[frame], density=True, bins=25)
+
+    ax1.set_xlabel('$x$', fontsize=15)
+    ax1.set_ylabel('$y$', fontsize=15)
+    ax1.set_title('Ideal gas animation', fontsize=15)
+    ax1.set_xlim(0, gas.L)
+    ax1.set_ylim(0, gas.L)
+    ax1.set_aspect('equal')
+    ax1.set_xticks([])  # remove ticks
+    ax1.set_yticks([])
+
+    ax2.set_xlim(0, 15)
+    ax2.set_ylim(0, 0.5)
+    ax2.set_xlabel('$v$ (m/s)', fontsize=15)
+    ax2.set_ylabel('frequency', fontsize=15)
+    ax2.set_title('Velocity distribution', fontsize=15)
+    ax2.plot(v, f, label='Maxwell-Boltzmann')
+    ax2.legend(fontsize=15)
+
+    plt.tight_layout()
+
+
+interval = duration*1e3/nsteps
+animation = FuncAnimation(fig, animate_positions,
+                          frames=nsteps, interval=interval)
+
+
+HTML(animation.to_html5_video())
